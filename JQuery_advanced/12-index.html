@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Task 12</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <script type="application/javascript">
+        function addPostRow(data) {
+            // Add an id attribute to the paragraph with row-ID
+            var rowId = `row-${data.id}`;
+            $('body').append(
+                $('<p>', { id: rowId }).append([
+                    // Append a span element with the text (delete) to the p, this span should come before the span with the post information
+                    $('<span>', {
+                        text: '(delete)',
+                        on: {
+                            // On click, call the function deletePost with the post id
+                            click: function () {
+                                var postId = data.id;
+                                deletePost(postId);
+                            }
+                        }
+                    }),
+                    // Append a span element with the post information
+                    $('<span>', { text: `Post created with id ${data.id}, title: ${data.title}, author: ${data.author}` })
+                ])
+            );
+        }
+
+        function deletePost(id) {
+            // Send a DELETE query to the posts endpoint with the id of the post
+            $.ajax({
+                url: `http://localhost:3000/posts/${id}`,
+                type: 'DELETE',
+                success: function () {
+                    // If the query is successful, remove the row from the body
+                    $(`#row-${id}`).remove();
+                },
+                error: function () {
+                    // If the query is not successful, display an alert with the message Post was not deleted
+                    alert('Post was not deleted');
+                }
+            });
+        }
+
+        function listPosts() {
+            // Query your local server on the posts endpoint
+            $.get('http://localhost:3000/posts', function (response, status) {
+                // When the server returns a 200 response, call the function addPostRow for each element in the response
+                if (status === 'success') {
+                    $.each(response, function (index, post) {
+                        addPostRow(post);
+                    });
+                } else {
+                    // When the server is unavailable, display an alert with the message Server Error
+                    alert('Server Error');
+                }
+            });
+        }
+
+        function displayLoading(loading) {
+            var ulElement = $('ul');
+
+            if (loading) {
+                // If loading is true, wrap the element with a div tag and the class loading
+                ulElement.wrap('<div class="loading"></div>');
+            } else {
+                // If loading is false, unwrap the ul from the div
+                ulElement.unwrap();
+            }
+        }
+
+        function buildForm() {
+            // Append to the body a form element
+            $('body').append(
+                $('<form>').append([
+                    // Inside the form, add a div element, with a label for author with text Author and an input of type text with id author
+                    $('<div>').append([
+                        $('<label>', { for: 'author', text: 'Author' }),
+                        $('<input>', { type: 'text', id: 'author' })
+                    ]),
+
+                    // Inside the form, add a div element, with a label for title with text Title and a textarea with id title
+                    $('<div>').append([
+                        $('<label>', { for: 'title', text: 'Title' }),
+                        $('<textarea>', { id: 'title' })
+                    ]),
+
+                    // Inside the form, add an input of type submit
+                    $('<input>', {
+                        type: 'submit',
+                        on: {
+                            // When clicking on the submit button, call the function sendForm
+                            submit: function (event) {
+                                event.preventDefault();
+                                sendForm();
+                            }
+                        }
+                    })
+                ])
+            );
+
+            // When clicking on the label, the input text should be selected by the browser
+            $('label').on('click', function () {
+                $(this).next('input').select();
+            });
+
+            // When pressing enter on the input text, the form should be submitted without reloading the page
+            $('input[type="text"], textarea').on('keypress', function (event) {
+                if (event.which === 13) {
+                    event.preventDefault();
+                    sendForm();
+                }
+            });
+        }
+
+        function sendForm() {
+            // Add after the form, the text About to send the query to the API
+            $('form').after('<p>About to send the query to the API</p>');
+
+            // Create a data object, with the title and author attributes. The values are the ones within the inputs
+            var postData = {
+                title: $('#title').val(),
+                author: $('#author').val()
+            };
+
+            // Send a POST query to your server endpoint posts with the data
+            $.ajax({
+                url: 'http://localhost:3000/posts',
+                type: 'POST',
+                data: postData,
+                success: function (data) {
+                    // If the query succeed, call the function addPostRow with the data coming back from the API
+                    addPostRow(data);
+                },
+                error: function () {
+                    // If the query does not succeed, display an alert with the message Error sending the POST query
+                    alert('Error sending the POST query');
+                },
+                complete: function () {
+                    // Remove the "About to send the query to the API" message after the request is complete
+                    $('p:contains("About to send the query to the API")').remove();
+                }
+            });
+        }
+
+        // Call the functions listPosts, buildForm, and deletePost when your page loads
+        $(document).ready(function () {
+            listPosts();
+            buildForm();
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Task 10</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <script type="application/javascript">
+        function addPostRow(data) {
+            // Append to the body a paragraph
+            $('body').append(
+                $('<p>').append(
+                    // The paragraph should contain a span element with the text
+                    $('<span>', { text: `Post created with id ${data.id}, title: ${data.title}, author: ${data.author}` })
+                )
+            );
+        }
+
+        function listPosts() {
+            // Query your local server on the posts endpoint
+            $.get('http://localhost:3000/posts', function (response, status) {
+                // When the server returns a 200 response, call the function addPostRow for each element in the response
+                if (status === 'success') {
+                    $.each(response, function (index, post) {
+                        addPostRow(post);
+                    });
+                } else {
+                    // When the server is unavailable, display an alert with the message Server Error
+                    alert('Server Error');
+                }
+            });
+        }
+
+        // Call the function listPosts when your page loads
+        $(document).ready(function() {
+            listPosts();
+        });
+    </script>
+
+</body>
+
+</html>

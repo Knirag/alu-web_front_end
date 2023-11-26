@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Task 9</title>
+    <style>
+        .loading {
+            opacity: 0.2;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script type="application/javascript">
+        function createSearchForm() {
+            // Append an empty input of type text without ID, name, or class
+            // Append an input of type submit
+            // Append an empty ul element
+            // Append another empty ul element with id "pagination"
+            $('body').append([
+                $('<input>', { type: 'text' }),
+                $('<input>', { type: 'submit', on: { click: function() { queryWikipedia($('input[type="text"]').val()); } } }),
+                $('<ul>'),
+                $('<ul>', { id: 'pagination' })
+            ]);
+        }
+
+        function addNewArticle(id, title, snippet) {
+            // Create an element li
+            // Within the li, add two paragraph elements
+            // Append the li to the ul element
+            $('ul').append(
+                $('<li>').append([
+                    $('<p>').append([
+                        $('<span>', { text: id + ' - ' }),
+                        $('<b>', { html: title })
+                    ]),
+                    $('<p>', { html: snippet })
+                ])
+            );
+        }
+
+        function buildPagination(numberOfItems, itemsPerPage, currentOffset) {
+            // Reset the pagination list to an empty tag
+            var paginationList = $('#pagination');
+            paginationList.empty();
+
+            // Write a loop that will display the pagination
+            var totalPages = Math.ceil(numberOfItems / itemsPerPage);
+            for (var i = 0; i < totalPages; i++) {
+                // Create a list item
+                var listItem = $('<li>', {
+                    text: i + 1,
+                    on: {
+                        click: function () {
+                            // When clicking on a page number, call the function queryWikipedia with the right offset
+                            var clickedPage = parseInt($(this).text()) - 1;
+                            queryWikipedia($('input[type="text"]').val(), clickedPage * itemsPerPage);
+                        }
+                    }
+                });
+
+                // Add CSS for each item
+                if (i === currentOffset / itemsPerPage) {
+                    listItem.addClass('active');
+                }
+
+                // Append the list item to the pagination list
+                paginationList.append(listItem);
+            }
+        }
+
+        function displayLoading(loading) {
+            var ulElement = $('ul');
+
+            if (loading) {
+                // If loading is true, wrap the element with a div tag and the class loading
+                ulElement.wrap('<div class="loading"></div>');
+            } else {
+                // If loading is false, unwrap the ul from the div
+                ulElement.unwrap();
+            }
+        }
+
+        function queryWikipedia(search, offset = 0) {
+            // Call the function displayLoading before querying the API
+            displayLoading(true);
+
+            // Create a data object with attributes required to query a search using the string passed in the argument with Wikipedia
+            var requestData = {
+                action: 'query',
+                format: 'json',
+                list: 'search',
+                srsearch: search,
+                sroffset: offset
+            };
+
+            // Use jQuery ajax method to query the Wikipedia API
+            $.ajax({
+                url: 'https://en.wikipedia.org/w/api.php',
+                dataType: 'jsonp',
+                data: requestData,
+                success: function(data) {
+                    // For each result returned by the API, call the function addNewArticle
+                    $.each(data.query.search, function(index, result) {
+                        addNewArticle(result.pageid, result.title, result.snippet);
+                    });
+
+                    // Call the function buildPagination with the totalhits, itemsPerPage, and currentOffset
+                    buildPagination(data.query.searchinfo.totalhits, 10, offset);
+
+                    // Once the API returns the value, remove the opacity by calling the function again
+                    displayLoading(false);
+                }
+            });
+        }
+
+        // Call the function createSearchForm when the page loads
+        $(document).ready(function() {
+            createSearchForm();
+        });
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Task 4</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script type="application/javascript">
+        // Create a function named createFamilyTree
+        function createFamilyTree() {
+            // Create a table element with head and body
+            var tableHTML = '<table>' +
+                                '<thead>' +
+                                    '<tr>' +
+                                        '<th>Firstname</th>' +
+                                        '<th>Lastname</th>' +
+                                    '</tr>' +
+                                '</thead>' +
+                                '<tbody>' +
+                                    '<tr>' +
+                                        '<td>Guillaume</td>' +
+                                        '<td>Salva</td>' +
+                                    '</tr>' +
+                                    '<tr>' +
+                                        '<td>Paulette</td>' +
+                                        '<td>Salva</td>' +
+                                    '</tr>' +
+                                    '<tr>' +
+                                        '<td>Antoine</td>' +
+                                        '<td>Salva</td>' +
+                                    '</tr>' +
+                                '</tbody>' +
+                            '</table>';
+
+            // Replace the entire table content with the new table HTML
+            $('body').html(tableHTML);
+        }
+
+        // Create a new function named replaceFamilyTree
+        function replaceFamilyTree() {
+            // Create a new tr element with two cells containing Gerard and Bonissa
+            var newTableRow = '<tr>' +
+                                '<td>Gerard</td>' +
+                                '<td>Bonissa</td>' +
+                            '</tr>';
+
+            // Replace the children of the tbody element with the new tr
+            $('tbody').html(newTableRow);
+        }
+
+        // Call the createFamilyTree and replaceFamilyTree functions
+        createFamilyTree();
+        replaceFamilyTree();
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>

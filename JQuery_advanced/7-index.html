@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Task 7</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script type="application/javascript">
+        function createSearchForm() {
+            // Append an empty input of type text without ID, name, or class
+            // Append an input of type submit
+            // Append an empty ul element
+            $('body').append([
+                $('<input>', { type: 'text' }),
+                $('<input>', { type: 'submit', on: { click: function() { queryWikipedia($('input[type="text"]').val()); } } }),
+                $('<ul>')
+            ]);
+        }
+
+        function addNewArticle(id, title, snippet) {
+            // Create an element li
+            // Within the li, add two paragraph elements
+            // Append the li to the ul element
+            $('ul').append(
+                $('<li>').append([
+                    $('<p>').append([
+                        $('<span>', { text: id + ' - ' }),
+                        $('<b>', { html: title })
+                    ]),
+                    $('<p>', { html: snippet })
+                ])
+            );
+        }
+
+        function queryWikipedia(search) {
+            // Create a data object with attributes required to query a search using the string passed in the argument with Wikipedia
+            var requestData = {
+                action: 'query',
+                format: 'json',
+                list: 'search',
+                srsearch: search
+            };
+
+            // Use jQuery ajax method to query the Wikipedia API
+            $.ajax({
+                url: 'https://en.wikipedia.org/w/api.php',
+                dataType: 'jsonp',
+                data: requestData,
+                success: function(data) {
+                    // For each result returned by the API, call the function addNewArticle
+                    $.each(data.query.search, function(index, result) {
+                        addNewArticle(result.pageid, result.title, result.snippet);
+                    });
+                }
+            });
+        }
+
+        // Call the function createSearchForm when the page loads
+        $(document).ready(function() {
+            createSearchForm();
+        });
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
